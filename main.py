@@ -7,10 +7,10 @@ import random
 app = FastAPI()
 
 bookings: dict[int, dict[str, Any]] = {
-    1: {"id": 1, "name": "Joel", "classroom": "A401", "booking_date": "2024-10-23", "start_time": "08:30", "end_time": "10:00"},
-    2: {"id": 2, "name": "Sami", "classroom": "C301", "booking_date": "2024-10-23", "start_time": "08:30", "end_time": "10:00"},
-    3: {"id": 3, "name": "Sami", "classroom": "B204", "booking_date": "2024-10-23", "start_time": "08:30", "end_time": "10:00"},
-    4: {"id": 4, "name": "Karin", "classroom": "A401", "booking_date": "2024-10-23", "start_time": "10:00", "end_time": "15:00"},
+    1: {"id": 1, "name": "Joel", "classroom": "A401", "booking_date": date(2024, 11, 12), "start_time": "08:30", "end_time": "10:00"},
+    2: {"id": 2, "name": "Sami", "classroom": "C301", "booking_date": date(2024, 11, 12), "start_time": "08:30", "end_time": "10:00"},
+    3: {"id": 3, "name": "Sami", "classroom": "B204", "booking_date": date(2024, 11, 12), "start_time": "08:30", "end_time": "10:00"},
+    4: {"id": 4, "name": "Karin", "classroom": "A401", "booking_date": date(2024, 11, 12), "start_time": "10:00", "end_time": "15:00"},
 }
 
 # fmt: off
@@ -61,9 +61,12 @@ class Booking(BaseModel):
         # Validerar att tid-strängarna är i formatet 'HH:MM'
         convert_to_time_objects(start_time, value)
 
-        booking_date = info.data.get("booking_date")  # Hämtar bokningsdatumet
+        # Hämtar bokningsdatumet (som vid en PUT-request också kan vara None)
+        booking_date = info.data.get("booking_date")
+
         # Validerar att bokningen är minst 1 timme lång, inte är i det förflutna, och att det är inom skolans öppettider
-        validate_times(booking_date, start_time, value)
+        if booking_date is not None:
+            validate_times(booking_date, start_time, value)
 
         return value
 
